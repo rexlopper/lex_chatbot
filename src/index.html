@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amazon Lex Widget on Vanilla JS</title>
+    <base href=".">
+    <link rel="stylesheet" href="style.css" />
+  	<link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="./widget/style.css" />
+  </head>
+  <body>
+    <main>
+      <div class="main-wrapper light_theme">
+        <img src="./img/shape.png" alt="" class="shape" />
+
+        <header>
+          <div class="container">
+            <div class="logo">
+              <img src="./img/prudential_logo.png" alt="Logo"/>
+            </div>
+
+            <div class="links">
+              <ul>
+                <li><a href="#">Plan</a></li>
+                <li><a href="#">Invest</a></li>
+                <li><a href="#">Insure</a></li>
+                <li><a href="#">Retire</a></li>
+                <li>
+                  <a href="#" class="btn upper">Sign Up</a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="overlay"></div>
+
+            <div class="hamburger-menu">
+              <div class="bar"></div>
+            </div>
+          </div>
+        </header>
+
+        <div class="content-area">
+          <div class="container">
+            <div class="left">
+              <img src="./img/insurance_pic.png" alt="Picure for insurance" class="insurance_pic" />
+            </div>
+            <div class="right">
+              <div class="big-title">
+                <h1>Your retirement’s </h1>
+                <h1>around the corner.</h1>
+                <h1>Now what?</h1>
+              </div>
+              <p class="text">
+                We’re here to help you reach the retirement you want. 
+                Unlock your Retirement Confidence Score and start planning 
+                for what comes next with a personalized plan.
+              </p>
+              <div class="cta">
+                <a href="#" class="btn">Get started</a>
+                <a href="#" class="btn">Learn More</a>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="bottom-area">
+          <div class="container">
+            <button class="toggle-btn">
+              <i class="far fa-moon"></i>
+              <i class="far fa-sun"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <div class="chatbox-wrapper">
+      <div class="chatbox-toggle">
+        <img src="./img/chatbot.png" alt="" class="chatbox-message-image-main">
+      </div>
+      <div class="chatbox-message-wrapper">
+        <div class="chatbox-message-header">
+          <div class="chatbox-message-profile">
+            <img src="./img/chat-profile.png" alt="" class="chatbox-message-image">
+            <div>
+              <h4 class="chatbox-message-name">Prudential Bot</h4>
+              <p class="chatbox-message-status">online</p>
+            </div>
+          </div>
+          <div class="chatbox-message-dropdown">
+            <i class='bx bx-dots-vertical-rounded chatbox-message-dropdown-toggle'></i>
+            <ul class="chatbox-message-dropdown-menu">
+              <li>
+                <a href="#">Find a professional</a>
+              </li>
+              <li>
+                <a href="#">Report</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="chatbox-message-content">
+          <h4 class="chatbox-message-no-message">Hello, let me insure you!</h4>
+          <div class="loading hide">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+            <div class="circle circle-3"></div>
+          </div>
+        </div>
+        <div class="chatbox-message-bottom">
+          <form action="#" class="chatbox-message-form">
+            <textarea rows="1" placeholder="Type a message..." class="chatbox-message-input"></textarea>
+            <button type="submit" class="chatbox-message-submit"><i class='bx bx-send' ></i></button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <%= javascript_importmap_tags %>
+    <%= javascript_include_tag "application", :"data-turbo-track" => "reload" %>
+    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+    </script>
+    <script type="module" src="../dist/bundle.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

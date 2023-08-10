@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: widget/script.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: widget/script.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileoverview This file contains the main script file for the widget.
+ * @author Rex Von Brixon Aparece Apa-ap
+ * @version 1.0.0
+ */
+const AmazonLexV2 = require('./chat.js')
+const textarea = document.querySelector('.chatbox-message-input')
+const chatboxForm = document.querySelector('.chatbox-message-form')
+const chatboxToggle = document.querySelector('.chatbox-toggle')
+const chatboxMessage = document.querySelector('.chatbox-message-wrapper')
+const chatboxMessageWrapper = document.querySelector('.chatbox-message-content')
+const chatboxNoMessage = document.querySelector('.chatbox-message-no-message')
+const loading = document.querySelector(".loading")
+
+/**
+ * Event listener for the text area.
+ */
+textarea.addEventListener('input', function () {
+	var line = textarea.value.split('\n').length
+
+	if(textarea.rows &lt; 7 || line &lt; 7) {
+		textarea.rows = line
+	}
+
+	if(textarea.rows > 1) {
+		chatboxForm.style.alignItems = 'flex-end'
+	} else {
+		chatboxForm.style.alignItems = 'center'
+	}
+})
+
+/**
+ * 
+ * @param {Boolean} show If show is True, append hide at the end of the ".loading" class.
+ */
+const toggleLoading=(show)=>loading.classList.toggle("hide", show)
+
+/**
+ * Event listening for the chatbox toggle. If the robot icon is click,
+ * the entire chatbox will appear.
+ */
+chatboxToggle.addEventListener('click', function () {
+	chatboxMessage.classList.toggle('show')
+})
+
+// DROPDOWN TOGGLE
+const dropdownToggle = document.querySelector('.chatbox-message-dropdown-toggle')
+const dropdownMenu = document.querySelector('.chatbox-message-dropdown-menu')
+
+/**
+ * Event listener for the dropdownToggle. Once click, the dropdown menu on the
+ * upper right of the chatbox will appear.
+ */
+dropdownToggle.addEventListener('click', function () {
+	dropdownMenu.classList.toggle('show')
+
+})
+
+
+/**
+ * Even listener to catch if there's any click outside the dropdown menu.
+ * If dropdown menu is enable and a click outside was caught, the dropdown menu,
+ * will minimize.
+ */
+document.addEventListener('click', function (e) {
+	if(!e.target.matches('.chatbox-message-dropdown, .chatbox-message-dropdown *')) {
+		dropdownMenu.classList.remove('show')
+	}
+})
+
+
+/**
+ * 
+ * @param {String} message Message to be sent to lex thru our class method.
+ */
+function chatLex(message) {
+	var chatbot = new AmazonLexV2();
+	const response = chatbot.sendTextMessageToAWS(message, "10000").then(data => {
+		setReplies(data['messages'])
+		}
+	)
+}
+
+/**
+ * 
+ * @param {String} reply Message received from lex.
+ */
+function textReply(reply){
+	const today = new Date()
+	let message = `
+		&lt;div class="chatbox-message-item received">
+			&lt;span class="chatbox-message-item-text">
+				${reply}
+			&lt;/span>
+		&lt;span class="chatbox-message-item-time">${prefixZero(today.getHours())}:${prefixZero(today.getMinutes())}&lt;/span>
+		&lt;/div>
+	`
+	setTimeout(()=>{
+		botReply(message)
+		toggleLoading(true)
+	}, 1700)
+
+}
+
+/**
+ * 
+ * @param {Object} reply Object message for imageResponseCard
+ */
+function cardReply(reply){
+	const today = new Date()
+	const responseCard = reply['imageResponseCard']
+	const subtitle = responseCard['subtitle']
+	let message = `&lt;div class="cta-cardreply">
+					&lt;span class="chatbox-message-item-text">
+						${subtitle}
+					&lt;/span>`			
+	for (const button of responseCard['buttons']){
+		message = message + `&lt;button type="submit" text=${button['text']} value=${button['value']} class="btn-cardreply">${button['text']}&lt;/button>`
+	}
+	message = message + `&lt;span class="chatbox-message-item-time">${prefixZero(today.getHours())}:${prefixZero(today.getMinutes())}&lt;/span>
+						&lt;/div>`
+
+	setTimeout(()=>{
+		botReply(message)
+		toggleLoading(true)
+	}, 1700)
+}
+
+/**
+ * 
+ * @param {Array} messages An array of messages received from lex.
+ */
+function setReplies(messages) {
+	for (const message of messages) {
+		toggleLoading(false)
+		const content = message['content']
+		if (content!==undefined) {
+			textReply(content)
+		} else {
+			cardReply(message)
+		}
+	}
+
+}
+
+/**
+ * Event listener to catch any submit made within chatbox form area.
+ * This will trigger to write the message in the UI and send the message to lex.
+ */
+chatboxForm.addEventListener('submit', function (e) {
+	e.preventDefault()
+	if(isValid(textarea.value)) {
+		const text = textarea.value
+		writeMessage()
+		chatLex(text)
+	}
+})
+
+/**
+ * Even listener to catch any click made within the chatbox content area.
+ * If the click is made on the "btn-cardreply" class, send chosen option within the button to lex.
+ */
+chatboxMessageWrapper.addEventListener('click', function (e) {
+	if(e.target.className === "btn-cardreply"){
+		chatLex(e.target.value)
+	}
+	e.preventDefault()
+})
+
+/**
+ * 
+ * @param {String} reply Html snippet for the bot message.
+ */
+function botReply(reply) {
+	chatboxMessageWrapper.insertAdjacentHTML('beforeend', reply)
+	scrollBottom()
+}
+
+/**
+ * 
+ * @param {Number} num If hour side if &lt;10, add a "0" prefix to maintain uniformity.
+ */
+function prefixZero(num) {
+	return num &lt; 10 ? '0'+num : num
+}
+
+
+/**
+ * Create an html snippet from the message on the text area and append it inside the message wrapper.
+ */
+function writeMessage() {
+	const today = new Date()
+	let message = `
+		&lt;div class="chatbox-message-item sent">
+			&lt;span class="chatbox-message-item-text">
+				${textarea.value.trim().replace(/\n/g, '&lt;br>\n')}
+			&lt;/span>
+			&lt;span class="chatbox-message-item-time">${prefixZero(today.getHours())}:${prefixZero(today.getMinutes())}&lt;/span>
+		&lt;/div>
+	`
+	chatboxMessageWrapper.insertAdjacentHTML('beforeend', message)
+	chatboxForm.style.alignItems = 'center'
+	textarea.rows = 1
+	textarea.focus()
+	textarea.value = ''
+	chatboxNoMessage.style.display = 'none'
+	scrollBottom()
+}
+
+/**
+ * Automatically scrolls to bottom of chat evertime there is a new message.
+ */
+function scrollBottom() {
+	chatboxMessageWrapper.scrollTo(0, chatboxMessageWrapper.scrollHeight)
+}
+
+/**
+ * 
+ * @param {String} value Value from the text area to be checked if it's a valid message.
+ */
+function isValid(value) {
+	// will ignore empty spaces or newlines
+	let text = value.replace(/\n/g, '')
+	text = text.replace(/\s/g, '')
+
+	return text.length > 0
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AmazonLexV2.html">AmazonLexV2</a></li></ul><h3>Classes</h3><ul><li><a href="module-AmazonLexV2.html">AmazonLexV2</a></li></ul><h3>Global</h3><ul><li><a href="global.html#botReply">botReply</a></li><li><a href="global.html#cardReply">cardReply</a></li><li><a href="global.html#chatLex">chatLex</a></li><li><a href="global.html#events">events</a></li><li><a href="global.html#isValid">isValid</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#prefixZero">prefixZero</a></li><li><a href="global.html#scrollBottom">scrollBottom</a></li><li><a href="global.html#setReplies">setReplies</a></li><li><a href="global.html#set_selectors">set_selectors</a></li><li><a href="global.html#textReply">textReply</a></li><li><a href="global.html#toggleAnimation">toggleAnimation</a></li><li><a href="global.html#toggleLoading">toggleLoading</a></li><li><a href="global.html#writeMessage">writeMessage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Jul 28 2023 11:33:51 GMT+0800 (Philippine Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

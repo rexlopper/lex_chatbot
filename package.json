@@ -1,0 +1,63 @@
+{
+  "dependencies": {
+    "@aws-sdk/client-lex-runtime-service": "^3.363.0",
+    "@aws-sdk/client-lex-runtime-v2": "^3.363.0",
+    "@babel/core": "^7.22.9",
+    "aws-sdk": "^2.1423.0",
+    "boto3": "^0.0.1",
+    "crypto": "^1.0.1",
+    "esmify": "^2.1.1",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
+    "i": "^0.3.7",
+    "open": "^9.1.0",
+    "path": "^0.12.7",
+    "prompt-sync": "^4.2.0",
+    "start": "^5.1.0",
+    "uniqid": "^5.4.0",
+    "url": "^0.11.1"
+  },
+  "name": "src",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "NODE_ENV=local node server.js",
+    "build": "webpack",
+    "doc": "jsdoc -c jsdoc.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "commonjs",
+  "devDependencies": {
+    "@babel/preset-env": "^7.22.9",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babelify": "^10.0.0",
+    "concurrently": "^8.2.0",
+    "dotenv": "^16.3.1",
+    "dotenv-webpack": "^8.0.1",
+    "http-server": "^14.1.1",
+    "jsdoc": "^4.0.2",
+    "sleep-ms": "^2.0.1",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.15.1"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "@babel/preset-env"
+          ]
+        }
+      ]
+    ]
+  }
+}
